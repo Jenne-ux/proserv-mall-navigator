@@ -82,14 +82,14 @@ function Sidebar({ floor, onSelectStore, selectedStore }) {
       <div className="legend">
         <h4>📖 Map Legend</h4>
         <div className="legend-items">
-          <div className="legend-item"><div className="legend-color anchor"></div>Anchor Store</div>
-          <div className="legend-item"><div className="legend-color dining"></div>Dining/Food</div>
-          <div className="legend-item"><div className="legend-color retail"></div>Retail</div>
-          <div className="legend-item"><div className="legend-color service"></div>Services</div>
-          <div className="legend-item"><div className="legend-color walkway"></div>Walkway</div>
+          <div className="legend-item"><div className="legend-color dining"></div>Dining / Food</div>
+          <div className="legend-item"><div className="legend-color retail"></div>Retail / Shopping</div>
+          <div className="legend-item"><div className="legend-color service"></div>Services & Facilities</div>
+          <div className="legend-item"><div className="legend-color walkway"></div>Walkway / Corridor</div>
           <div className="legend-item"><div className="legend-color you"></div>Your Position</div>
           <div className="legend-item"><div className="legend-color destination"></div>Destination</div>
           <div className="legend-item"><div className="legend-color path"></div>Navigation Path</div>
+          <div className="legend-item"><div className="legend-color escalator"></div>Escalator</div>
         </div>
       </div>
     </div>

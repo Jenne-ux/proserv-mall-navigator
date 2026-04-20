@@ -139,7 +139,7 @@ function MapView({ floor, selectedStore, onSelectStore, pathPoints, userPosition
           </g>
         ))}
         
-        {/* Navigation Path - Centered on walkways */}
+        {/* Navigation Path */}
         {showPath && pathPoints && pathPoints.length > 1 && (
           <>
             <polyline 
@@ -168,7 +168,7 @@ function MapView({ floor, selectedStore, onSelectStore, pathPoints, userPosition
         <rect x="480" y="600" width="12" height="6" fill="#ccc" rx="1" />
         <text x="475" y="592" textAnchor="middle" fontSize="8" fill="#666" fontWeight="bold">ENTRANCE</text>
         
-        {/* User Position */}
+        {/* User Position – static icon size unchanged (24x24) */}
         {userPosition ? (
           <g className={userPosition.isMoving ? 'walking-animation' : ''}>
             <image 
@@ -188,8 +188,42 @@ function MapView({ floor, selectedStore, onSelectStore, pathPoints, userPosition
           </g>
         ) : (
           <g>
-            <image href={personIcon} x="463" y="573" width="24" height="24" />
-            <text x="475" y="570" textAnchor="middle" fontSize="7" fill="#666" fontWeight="bold">YOU ARE HERE</text>
+            {/* Pulsing outer ring (same as moving state) */}
+            <circle cx="475" cy="585" r="22" fill="#3b82f6" opacity="0.15">
+              <animate attributeName="r" from="22" to="34" dur="1.5s" repeatCount="indefinite" />
+              <animate attributeName="opacity" from="0.15" to="0" dur="1.5s" repeatCount="indefinite" />
+            </circle>
+            {/* Person icon – same 24x24 size as moving state */}
+            <image 
+              href={personIcon} 
+              x="463" 
+              y="573" 
+              width="24" 
+              height="24"
+              style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}
+            />
+            {/* Improved badge background */}
+            <rect 
+              x="420" 
+              y="560" 
+              width="110" 
+              height="18" 
+              fill="#2d3748" 
+              rx="9" 
+              opacity="0.95"
+              style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))' }}
+            />
+            {/* Badge text with location pin */}
+            <text 
+              x="475" 
+              y="573" 
+              textAnchor="middle" 
+              fontSize="9" 
+              fill="white" 
+              fontWeight="bold"
+            >
+              📍 YOU ARE HERE
+            </text>
           </g>
         )}
         

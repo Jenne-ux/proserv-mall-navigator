@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { generateDirections } from '../utils/navigation';
+import { generateDirections, getSimpleDirections } from '../utils/navigation';
 
 function InfoPanel({ store, distance, eta, isSimulating, onSimulate, onPause, progress }) {
   const [showQR, setShowQR] = useState(false);
@@ -24,18 +24,26 @@ function InfoPanel({ store, distance, eta, isSimulating, onSimulate, onPause, pr
   }
   
   const handleGetDirections = () => {
-    const baseUrl = window.location.origin;
-    const queryString = new URLSearchParams({
-      store: store.name,
-      floor: store.floor,
-      x: store.entranceX,
-      y: store.entranceY,
-      dist: distance,
-      time: eta
-    }).toString();
+    const needsEscalator = store.floor === 'second';
+    const simpleDirections = getSimpleDirections(store, needsEscalator);
     
-    const fullUrl = `${baseUrl}/navigate?${queryString}`;
-    setQrValue(fullUrl);
+    const plainTextContent = `
+PROSERV MALL NAVIGATION
+========================
+
+STORE: ${store.name}
+FLOOR: ${store.floor === 'ground' ? 'Ground Floor' : 'Second Floor'}
+DISTANCE: ${distance} meters
+ESTIMATED TIME: ${eta} minutes
+
+DIRECTIONS:
+${simpleDirections.map((step, i) => `${i+1}. ${step}`).join('\n')}
+
+Scan this QR code again for live updates.
+========================
+    `.trim();
+    
+    setQrValue(plainTextContent);
     setShowQR(true);
   };
   
@@ -148,7 +156,7 @@ function InfoPanel({ store, distance, eta, isSimulating, onSimulate, onPause, pr
         </div>
       )}
       
-      {/* QR Code Modal */}
+      {/* QR Code Modal – text preview removed */}
       {showQR && (
         <div className="qr-modal" onClick={handleCloseQR}>
           <div className="qr-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -175,22 +183,7 @@ function InfoPanel({ store, distance, eta, isSimulating, onSimulate, onPause, pr
             <div className="qr-instructions">
               <p>1. Open your phone camera</p>
               <p>2. Point at this QR code</p>
-              <p>3. Tap the notification to open</p>
-              <p>4. Get turn-by-turn directions</p>
-            </div>
-            
-            <div className="qr-alternative">
-              <p className="qr-link-label">Or open this link:</p>
-              <div className="qr-link">{qrValue}</div>
-              <button 
-                className="copy-link-btn"
-                onClick={() => {
-                  navigator.clipboard.writeText(qrValue);
-                  alert('Link copied to clipboard!');
-                }}
-              >
-                📋 Copy Link
-              </button>
+              <p>3. Tap the notification to see directions</p>
             </div>
           </div>
         </div>
@@ -199,9 +192,9 @@ function InfoPanel({ store, distance, eta, isSimulating, onSimulate, onPause, pr
       {/* QR Info Footer */}
       <div className="qr-container">
         <div style={{ fontSize: '48px', marginBottom: '8px' }}>📱</div>
-        <p>Click "Get Directions on Phone"<br/>to receive a QR code for navigation</p>
+        <p>Click "Get Directions on Phone"<br/>to receive a QR code with step-by-step directions</p>
         <p style={{ fontSize: '9px', marginTop: '8px', color: '#aaa' }}>
-          Scan with your phone camera to get directions
+          Scan with your phone camera to get the full navigation instructions
         </p>
       </div>
     </div>
