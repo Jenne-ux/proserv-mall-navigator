@@ -3,10 +3,12 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import MapView from './components/MapView';
 import InfoPanel from './components/InfoPanel';
+import SplashScreen from './components/SplashScreen';
 import { generatePath, calculateDistanceFromPath, calculateETA, getSimpleDirections, createSmoothPath, generateQRData } from './utils/navigation';
 import './styles/kiosk.css';
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [currentFloor, setCurrentFloor] = useState('ground');
   const [selectedStore, setSelectedStore] = useState(null);
   const [pathData, setPathData] = useState(null);
@@ -20,6 +22,10 @@ function App() {
   const [qrData, setQrData] = useState(null);
   const intervalRef = useRef(null);
   const hasSwitchedFloor = useRef(false);
+  
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+  };
   
   const selectStore = useCallback((store) => {
     // Clear any ongoing simulation
@@ -198,6 +204,10 @@ function App() {
     ? (simulationIndex / (smoothPoints.length - 1)) * 100 
     : 0;
   
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} />;
+  }
+  
   return (
     <div className="app">
       <Header 
@@ -207,7 +217,8 @@ function App() {
         selectedStore={selectedStore}
       />
       
-      <div className="main-layout">
+      <div
+      className="main-layout">
         <Sidebar 
           floor={currentFloor} 
           onSelectStore={selectStore} 
