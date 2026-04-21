@@ -139,17 +139,19 @@ function MapView({ floor, selectedStore, onSelectStore, pathPoints, userPosition
           </g>
         ))}
         
-        {/* Navigation Path */}
+        {/* Navigation Path – uses raw pathPoints (no smoothing) */}
         {showPath && pathPoints && pathPoints.length > 1 && (
           <>
+            {/* Outer glow */}
             <polyline 
               points={pathPoints.map(p => `${p.x},${p.y}`).join(' ')} 
               stroke="#ef4444" 
               strokeWidth="6" 
               strokeDasharray="10,6" 
               fill="none"
-              opacity="0.15"
+              opacity="0.2"
             />
+            {/* Main marching ants line */}
             <polyline 
               points={pathPoints.map(p => `${p.x},${p.y}`).join(' ')} 
               stroke="#ef4444" 
@@ -168,7 +170,7 @@ function MapView({ floor, selectedStore, onSelectStore, pathPoints, userPosition
         <rect x="480" y="600" width="12" height="6" fill="#ccc" rx="1" />
         <text x="475" y="592" textAnchor="middle" fontSize="8" fill="#666" fontWeight="bold">ENTRANCE</text>
         
-        {/* User Position – static icon size unchanged (24x24) */}
+        {/* User Position */}
         {userPosition ? (
           <g className={userPosition.isMoving ? 'walking-animation' : ''}>
             <image 
@@ -188,12 +190,10 @@ function MapView({ floor, selectedStore, onSelectStore, pathPoints, userPosition
           </g>
         ) : (
           <g>
-            {/* Pulsing outer ring (same as moving state) */}
             <circle cx="475" cy="585" r="22" fill="#3b82f6" opacity="0.15">
               <animate attributeName="r" from="22" to="34" dur="1.5s" repeatCount="indefinite" />
               <animate attributeName="opacity" from="0.15" to="0" dur="1.5s" repeatCount="indefinite" />
             </circle>
-            {/* Person icon – same 24x24 size as moving state */}
             <image 
               href={personIcon} 
               x="463" 
@@ -202,7 +202,6 @@ function MapView({ floor, selectedStore, onSelectStore, pathPoints, userPosition
               height="24"
               style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}
             />
-            {/* Improved badge background */}
             <rect 
               x="420" 
               y="560" 
@@ -213,7 +212,6 @@ function MapView({ floor, selectedStore, onSelectStore, pathPoints, userPosition
               opacity="0.95"
               style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))' }}
             />
-            {/* Badge text with location pin */}
             <text 
               x="475" 
               y="573" 

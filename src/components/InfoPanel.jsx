@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { generateDirections, getSimpleDirections } from '../utils/navigation';
 
-function InfoPanel({ store, distance, eta, isSimulating, onSimulate, onPause, progress }) {
+function InfoPanel({ store, distance, eta, isSimulating, progress }) {
   const [showQR, setShowQR] = useState(false);
   const [qrValue, setQrValue] = useState('');
   const [expandedStep, setExpandedStep] = useState(null);
@@ -127,23 +127,14 @@ Scan this QR code again for live updates.
         </div>
       </div>
       
-      {/* Action Buttons */}
+      {/* Action Buttons - Only QR button remains */}
       <div className="action-buttons">
-        {!isSimulating ? (
-          <button className="action-btn simulate-btn" onClick={onSimulate}>
-            🚶 Start Walking Simulation
-          </button>
-        ) : (
-          <button className="action-btn pause-btn" onClick={onPause}>
-            ⏸️ Pause Simulation
-          </button>
-        )}
         <button className="action-btn qr-btn" onClick={handleGetDirections}>
           📱 Get Directions on Phone
         </button>
       </div>
       
-      {/* Progress Bar */}
+      {/* Progress Bar - shows during auto-simulation */}
       {isSimulating && (
         <div className="progress-container">
           <div className="progress-label">
@@ -156,7 +147,7 @@ Scan this QR code again for live updates.
         </div>
       )}
       
-      {/* QR Code Modal – text preview removed */}
+      {/* QR Code Modal */}
       {showQR && (
         <div className="qr-modal" onClick={handleCloseQR}>
           <div className="qr-modal-content" onClick={(e) => e.stopPropagation()}>

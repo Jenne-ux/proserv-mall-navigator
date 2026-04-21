@@ -1,7 +1,7 @@
 import React from 'react';
 import proservLogo from '../assets/proserv_plus_logo-removebg-preview.png';
 
-function Header({ floor, onFloorChange, onReset, selectedStore }) {
+function Header({ floor, onFloorChange, onReturnHome, selectedStore }) {
   return (
     <header className="header">
       <div className="logo-section">
@@ -28,8 +28,8 @@ function Header({ floor, onFloorChange, onReset, selectedStore }) {
           </button>
         </div>
         
-        <button className="reset-btn" onClick={onReset}>
-          🔄 Reset Navigation
+        <button className="reset-btn" onClick={onReturnHome}>
+          🏠 Return to Home
         </button>
       </div>
       
@@ -40,7 +40,7 @@ function Header({ floor, onFloorChange, onReset, selectedStore }) {
             <span>{selectedStore.name}</span>
           </>
         ) : (
-          <span>&nbsp;</span> // empty placeholder to maintain layout
+          <span>&nbsp;</span>
         )}
       </div>
 

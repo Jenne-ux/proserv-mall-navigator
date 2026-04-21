@@ -27,113 +27,8 @@ function App() {
     setShowSplash(false);
   };
   
-  const selectStore = useCallback((store) => {
-    // Clear any ongoing simulation
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    
-    setIsSimulating(false);
-    setSimulationIndex(0);
-    hasSwitchedFloor.current = false;
-    
-    // Set selected store and floor
-    setSelectedStore(store);
-    setCurrentFloor(store.floor);
-    
-    // Generate navigation path
-    const path = generatePath(store, store.floor);
-    setPathData(path);
-    
-    // Calculate distance using all points
-    const allPoints = [...path.groundPath, ...path.secondPath];
-    const dist = calculateDistanceFromPath(allPoints);
-    setDistance(dist);
-    
-    // Calculate ETA
-    const needsEscalator = store.floor === 'second';
-    const time = calculateETA(dist, needsEscalator);
-    setEta(time);
-    
-    // Generate simple text directions for display
-    const simpleDirs = getSimpleDirections(store, needsEscalator);
-    setDirections(simpleDirs);
-    
-    // Create smooth path for animation
-    const smooth = createSmoothPath(allPoints, 25);
-    setSmoothPoints(smooth);
-    
-    // Set display path based on store's floor
-    if (store.floor === 'ground') {
-      setDisplayPath(path.groundPath);
-    } else {
-      setDisplayPath(path.secondPath);
-    }
-    
-    // Generate QR data
-    const qr = generateQRData(store);
-    setQrData(qr);
-  }, []);
-  
-  const startSimulation = useCallback(() => {
-    if (!smoothPoints.length || !selectedStore) {
-      console.warn('No smooth points or selected store available');
-      return;
-    }
-    
-    // Clear any existing interval
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    
-    setIsSimulating(true);
-    setSimulationIndex(0);
-    hasSwitchedFloor.current = false;
-    
-    // Ensure we're on the correct floor
-    setCurrentFloor(selectedStore.floor);
-    if (selectedStore.floor === 'ground') {
-      setDisplayPath(pathData?.groundPath || []);
-    } else {
-      setDisplayPath(pathData?.secondPath || []);
-    }
-    
-    // Start animation interval - smoother movement
-    intervalRef.current = setInterval(() => {
-      setSimulationIndex(prev => {
-        const next = prev + 1;
-        
-        // Check if animation is complete
-        if (next >= smoothPoints.length - 1) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-          setIsSimulating(false);
-          return smoothPoints.length - 1;
-        }
-        
-        return next;
-      });
-    }, 40); // 40ms for smooth walking animation
-  }, [smoothPoints, selectedStore, pathData]);
-  
-  const pauseSimulation = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    setIsSimulating(false);
-  }, []);
-  
-  const reset = useCallback(() => {
-    // Clear simulation
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    
-    // Reset all state
+  const returnToHome = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setSelectedStore(null);
     setPathData(null);
     setSimulationIndex(0);
@@ -146,16 +41,86 @@ function App() {
     setDirections([]);
     setQrData(null);
     hasSwitchedFloor.current = false;
+    setShowSplash(true);
   }, []);
+  
+  const startSimulation = useCallback((points, store, path) => {
+    if (!points.length || !store) return;
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    
+    setIsSimulating(true);
+    setSimulationIndex(0);
+    hasSwitchedFloor.current = false;
+    
+    // For multi‑floor routes, start on ground floor
+    if (path.multiFloor) {
+      setCurrentFloor('ground');
+      setDisplayPath(path.groundPath);
+    } else {
+      setCurrentFloor(store.floor);
+      setDisplayPath(store.floor === 'ground' ? path.groundPath : path.secondPath);
+    }
+    
+    intervalRef.current = setInterval(() => {
+      setSimulationIndex(prev => {
+        const next = prev + 1;
+        if (next >= points.length - 1) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          setIsSimulating(false);
+          return points.length - 1;
+        }
+        return next;
+      });
+    }, 40);
+  }, []);
+  
+  const selectStore = useCallback((store) => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setIsSimulating(false);
+    setSimulationIndex(0);
+    hasSwitchedFloor.current = false;
+    setSelectedStore(store);
+    
+    const path = generatePath(store, store.floor);
+    setPathData(path);
+    
+    const allPoints = [...path.groundPath, ...path.secondPath];
+    const dist = calculateDistanceFromPath(allPoints);
+    setDistance(dist);
+    
+    const needsEscalator = store.floor === 'second';
+    const time = calculateETA(dist, needsEscalator);
+    setEta(time);
+    
+    const simpleDirs = getSimpleDirections(store, needsEscalator);
+    setDirections(simpleDirs);
+    
+    const smooth = createSmoothPath(allPoints, 25);
+    setSmoothPoints(smooth);
+    
+    // IMPORTANT: For multi‑floor routes, show ground path first
+    if (path.multiFloor) {
+      setCurrentFloor('ground');
+      setDisplayPath(path.groundPath);
+    } else {
+      setCurrentFloor(store.floor);
+      setDisplayPath(store.floor === 'ground' ? path.groundPath : path.secondPath);
+    }
+    
+    const qr = generateQRData(store);
+    setQrData(qr);
+    
+    // Start simulation after a short delay
+    setTimeout(() => startSimulation(smooth, store, path), 50);
+  }, [startSimulation]);
   
   const handleFloorChange = useCallback((floor) => {
     setCurrentFloor(floor);
-    
-    // Update displayed path based on selected floor and store
     if (selectedStore && pathData) {
-      if (floor === 'ground' && pathData.groundPath && pathData.groundPath.length > 0) {
+      if (floor === 'ground' && pathData.groundPath?.length) {
         setDisplayPath(pathData.groundPath);
-      } else if (floor === 'second' && pathData.secondPath && pathData.secondPath.length > 0) {
+      } else if (floor === 'second' && pathData.secondPath?.length) {
         setDisplayPath(pathData.secondPath);
       } else {
         setDisplayPath([]);
@@ -163,7 +128,7 @@ function App() {
     }
   }, [selectedStore, pathData]);
   
-  // Handle floor switching during simulation (for multi-floor navigation)
+  // Auto floor switching during simulation
   useEffect(() => {
     if (!isSimulating || !smoothPoints.length || !pathData?.multiFloor) return;
     if (hasSwitchedFloor.current) return;
@@ -171,60 +136,40 @@ function App() {
     const currentPoint = smoothPoints[simulationIndex];
     if (!currentPoint) return;
     
-    // Check if we're at the escalator (around y=165-185)
     const isAtEscalator = currentPoint.y >= 165 && currentPoint.y <= 185 && 
                           currentPoint.x >= 470 && currentPoint.x <= 500;
     
     if (isAtEscalator && simulationIndex > 5 && currentFloor === 'ground') {
       hasSwitchedFloor.current = true;
       setCurrentFloor('second');
-      if (pathData.secondPath && pathData.secondPath.length > 0) {
-        setDisplayPath(pathData.secondPath);
-      }
+      if (pathData.secondPath?.length) setDisplayPath(pathData.secondPath);
     }
   }, [simulationIndex, isSimulating, smoothPoints, pathData, currentFloor]);
   
-  // Cleanup interval on unmount
   useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, []);
   
-  // Get current user position for display
   const userPosition = smoothPoints.length && simulationIndex > 0 && isSimulating
     ? { ...smoothPoints[simulationIndex], isMoving: true }
     : null;
   
-  // Calculate progress percentage
   const progress = smoothPoints.length > 1 && simulationIndex > 0 
     ? (simulationIndex / (smoothPoints.length - 1)) * 100 
     : 0;
   
-  if (showSplash) {
-    return <SplashScreen onComplete={handleSplashComplete} />;
-  }
+  if (showSplash) return <SplashScreen onComplete={handleSplashComplete} />;
   
   return (
     <div className="app">
       <Header 
         floor={currentFloor} 
         onFloorChange={handleFloorChange} 
-        onReset={reset}
+        onReturnHome={returnToHome}
         selectedStore={selectedStore}
       />
-      
-      <div
-      className="main-layout">
-        <Sidebar 
-          floor={currentFloor} 
-          onSelectStore={selectStore} 
-          selectedStore={selectedStore}
-        />
-        
+      <div className="main-layout">
+        <Sidebar floor={currentFloor} onSelectStore={selectStore} selectedStore={selectedStore} />
         <MapView 
           floor={currentFloor}
           selectedStore={selectedStore}
@@ -233,15 +178,12 @@ function App() {
           userPosition={userPosition}
           showPath={!!selectedStore}
         />
-        
         <InfoPanel 
           store={selectedStore}
           distance={distance}
           eta={eta}
           directions={directions}
           isSimulating={isSimulating}
-          onSimulate={startSimulation}
-          onPause={pauseSimulation}
           progress={progress}
           qrData={qrData}
         />
