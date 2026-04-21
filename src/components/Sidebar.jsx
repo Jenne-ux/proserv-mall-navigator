@@ -13,19 +13,36 @@ function Sidebar({ floor, onSelectStore, selectedStore }) {
     return cats;
   }, [currentStores]);
   
-  // Quick access stores - different for each floor
+  // Quick access stores - includes restroom on both floors
   const quickStores = useMemo(() => {
+    // Find restroom store (by category or name)
+    const restroomStore = currentStores.find(s => 
+      s.category === 'Restrooms' || s.name.toLowerCase().includes('restroom')
+    );
+    
+    // Other quick access categories based on floor
+    let otherStores = [];
     if (floor === 'ground') {
-      return currentStores.filter(s => 
-        ['Food Court', 'Coffee Shop', 'Restrooms', 'Customer Service'].includes(s.category) || 
+      otherStores = currentStores.filter(s => 
+        ['Food Court', 'Coffee Shop', 'Customer Service'].includes(s.category) || 
         s.name === 'Customer Service'
-      ).slice(0, 5);
+      );
     } else {
-      // Second floor quick access
-      return currentStores.filter(s => 
+      otherStores = currentStores.filter(s => 
         ['Cafe', 'Dining', 'Facilities', 'Entertainment'].includes(s.category)
-      ).slice(0, 5);
+      );
     }
+    
+    // Remove the restroom from otherStores if it was already included
+    if (restroomStore) {
+      otherStores = otherStores.filter(s => s.id !== restroomStore.id);
+    }
+    
+    // Build quick access list: restroom first, then up to 4 others (total 5)
+    const quick = [];
+    if (restroomStore) quick.push(restroomStore);
+    quick.push(...otherStores.slice(0, 5 - quick.length));
+    return quick;
   }, [currentStores, floor]);
   
   return (

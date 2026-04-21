@@ -22,29 +22,26 @@ function SplashScreen({ onComplete }) {
   return (
     <div className={`splash-screen ${fadeOut ? 'fade-out' : ''}`} onClick={handleTap}>
       <div className="splash-content">
-        <div className="logo-container">
-          <div className="logo-mark">
-            <img 
-              src={proservLogo} 
-              alt="ProServ Plus Logo" 
-              className="logo-image"
-            />
+        <div className="top-section">
+          <h1 className="proserv-text">PROSERV</h1>
+          <h2 className="splash-title">Mall Navigator</h2>
+          <p className="splash-subtitle">Smart Navigation Kiosk System</p>
+          
+          <div className="tap-container">
+            <div className={`tap-button ${pulse ? 'pulse' : ''}`}>
+              <span className="tap-text">TAP HERE TO START</span>
+            </div>
+            <p className="tap-subtext">Touch anywhere on screen to continue</p>
           </div>
-          <h1 className="logo-text">PROSERV</h1>
-          <div className="logo-divider"></div>
         </div>
         
-        <h2 className="splash-title">Mall Navigator</h2>
-        <p className="splash-subtitle">Smart Navigation Kiosk System</p>
-        
-        <div className="tap-container">
-          <div className={`tap-button ${pulse ? 'pulse' : ''}`}>
-            <span className="tap-text">TAP HERE TO START</span>
-          </div>
-          <p className="tap-subtext">Touch anywhere on screen to continue</p>
-        </div>
-        
-        <div className="splash-footer">
+        <div className="powered-wrapper">
+          <span className="powered-text">Powered by</span>
+          <img 
+            src={proservLogo} 
+            alt="ProServ Plus Logo" 
+            className="footer-logo"
+          />
         </div>
       </div>
       
@@ -80,66 +77,48 @@ function SplashScreen({ onComplete }) {
         }
         
         .splash-content {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
           text-align: center;
-          padding: 50px;
-          max-width: 700px;
+          padding: 60px 40px 20px 40px;
+          max-width: 800px;
           width: 90%;
+          height: 85vh;
+          max-height: 700px;
           animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .logo-container {
-          margin-bottom: 48px;
+        .top-section {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
         }
         
-        .logo-mark {
-          margin-bottom: 24px;
-          display: inline-block;
-          animation: logoFloat 2s ease-in-out infinite;
-        }
-        
-        .logo-image {
-          width: 260px;   /* exactly 260px as requested */
-          height: auto;
-          max-width: 100%;
-          transition: transform 0.3s ease;
-          display: block;
-          background: transparent;
-        }
-        
-        .logo-image:hover {
-          transform: scale(1.02);
-        }
-        
-        .logo-text {
-          font-size: 42px;
+        .proserv-text {
+          font-size: 50px;
           font-weight: 700;
           font-family: 'Montserrat', 'Helvetica Neue', sans-serif;
           background: linear-gradient(135deg, #2c5f8a 0%, #4a90e2 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
-          margin: 0 0 16px 0;
-          letter-spacing: 4px;
-        }
-        
-        .logo-divider {
-          width: 80px;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, #4a90e2, #2c5f8a, transparent);
-          margin: 0 auto;
+          margin: 0 0 8px 0;   /* reduced from 24px to 8px */
+          letter-spacing: 6px;
         }
         
         .splash-title {
-          font-size: 36px;
+          font-size: 44px;
           font-weight: 600;
           font-family: 'Montserrat', 'Helvetica Neue', sans-serif;
           color: #1a4a6e;
-          margin: 0 0 12px 0;
+          margin: 0 0 16px 0;
           letter-spacing: -0.5px;
         }
         
         .splash-subtitle {
-          font-size: 16px;
+          font-size: 20px;
           font-weight: 400;
           font-family: 'Inter', 'Segoe UI', sans-serif;
           color: #4a7a9e;
@@ -148,12 +127,12 @@ function SplashScreen({ onComplete }) {
         }
         
         .tap-container {
-          margin: 48px 0;
+          margin: 32px 0 0;
         }
         
         .tap-button {
           background: linear-gradient(135deg, #4a90e2 0%, #2c5f8a 100%);
-          padding: 16px 40px;
+          padding: 18px 48px;
           border-radius: 60px;
           display: inline-block;
           transition: all 0.3s ease;
@@ -167,7 +146,7 @@ function SplashScreen({ onComplete }) {
         }
         
         .tap-text {
-          font-size: 18px;
+          font-size: 22px;
           font-weight: 600;
           font-family: 'Montserrat', 'Helvetica Neue', sans-serif;
           color: #ffffff;
@@ -175,17 +154,35 @@ function SplashScreen({ onComplete }) {
         }
         
         .tap-subtext {
+          font-size: 14px;
+          font-weight: 400;
+          font-family: 'Inter', 'Segoe UI', sans-serif;
+          color: #4a7a9e;
+          margin-top: 16px;
+          letter-spacing: 0.5px;
+        }
+        
+        .powered-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          margin-bottom: 0;
+        }
+        
+        .powered-text {
           font-size: 13px;
           font-weight: 400;
           font-family: 'Inter', 'Segoe UI', sans-serif;
           color: #4a7a9e;
-          margin-top: 20px;
           letter-spacing: 0.5px;
         }
         
-        .splash-footer {
-          margin-top: 60px;
-          padding-top: 24px;
+        .footer-logo {
+          width: 140px;
+          height: auto;
+          background: transparent;
+          display: inline-block;
         }
         
         @keyframes fadeInUp {
@@ -199,15 +196,6 @@ function SplashScreen({ onComplete }) {
           }
         }
         
-        @keyframes logoFloat {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-        
         .tap-button:hover {
           transform: scale(1.05);
           box-shadow: 0 12px 30px rgba(42, 95, 138, 0.35);
@@ -215,14 +203,36 @@ function SplashScreen({ onComplete }) {
         
         @media (max-width: 768px) {
           .splash-content {
-            padding: 30px 20px;
-            max-width: 600px;
+            padding: 40px 30px 15px 30px;
+            height: 80vh;
           }
-          .logo-text {
+          .proserv-text {
+            font-size: 42px;
+          }
+          .splash-title {
+            font-size: 34px;
+          }
+          .splash-subtitle {
+            font-size: 16px;
+          }
+          .tap-text {
+            font-size: 18px;
+          }
+          .tap-button {
+            padding: 14px 36px;
+          }
+          .footer-logo {
+            width: 100px;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .splash-content {
+            padding: 30px 20px 10px 20px;
+            height: 75vh;
+          }
+          .proserv-text {
             font-size: 32px;
-          }
-          .logo-image {
-            width: 200px;   /* scaled proportionally */
           }
           .splash-title {
             font-size: 28px;
@@ -233,32 +243,14 @@ function SplashScreen({ onComplete }) {
           .tap-text {
             font-size: 16px;
           }
-          .tap-button {
-            padding: 14px 32px;
-          }
-        }
-        
-        @media (max-width: 480px) {
-          .logo-text {
-            font-size: 28px;
-          }
-          .logo-image {
-            width: 150px;   /* scaled proportionally */
-          }
-          .splash-title {
-            font-size: 24px;
-          }
-          .splash-subtitle {
-            font-size: 12px;
-          }
-          .tap-text {
-            font-size: 14px;
-          }
           .tap-subtext {
-            font-size: 11px;
+            font-size: 12px;
           }
           .tap-button {
             padding: 12px 28px;
+          }
+          .footer-logo {
+            width: 80px;
           }
         }
       `}</style>
